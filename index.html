@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Smart Calculator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #ffffff;
+        }
+
+        .calc-container {
+            background-color: #121212;
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            position: relative;
+        }
+
+        @media (min-width: 401px) {
+            .calc-container {
+                height: 850px;
+                border-radius: 30px;
+                box-shadow: 0 15px 35px rgba(255,255,255,0.05);
+            }
+        }
+
+        /* Header & 3-Dot Menu */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .menu-dropdown {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            background-color: #2c2c2c;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            z-index: 100;
+            overflow: hidden;
+        }
+
+        .menu-dropdown button {
+            display: block;
+            width: 100%;
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: white;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .menu-dropdown button:hover {
+            background-color: #3d3d3d;
+        }
+
+        /* Displays */
+        .display-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+        }
+
+        /* Writable input fields for fine control */
+        .calc-input {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 40px;
+            text-align: right;
+            width: 100%;
+            outline: none;
+            direction: ltr;
+        }
+
+        /* Currency Mode Layout (Match with user image) */
+        .currency-box-container {
+            display: none;
+            flex-direction: row;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .currency-inputs {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .currency-card {
+            background-color: #1c1c1e;
+            border-radius: 16px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .currency-label {
+            color: #8e8e93;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .currency-val {
+            background: none;
+            border: none;
+            color: #ff9f0a;
+            font-size: 32px;
+            width: 100%;
+            outline: none;
+        }
+
+        .currency-swap {
+            width: 60px;
+            background-color: #1c1c1e;
+            border-radius: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 24px;
+            color: #ff9f0a;
+        }
+
+        .api-status {
+            font-size: 11px;
+            color: #666;
+            text-align: left;
+            margin-top: 5px;
+        }
+
+        /* Keypad Grid */
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        .btn {
+            background-color: #1c1c1e;
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            aspect-ratio: 1;
+            font-size: 24px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: filter 0.1s;
+            user-select: none;
+        }
+
+        .btn:active {
+            filter: brightness(1.4);
+        }
+
+        .btn.operator {
+            background-color: #ff9f0a;
+            color: #ffffff;
+        }
+
+        .btn.action {
+            background-color: #a5a5a5;
+            color: #000000;
+        }
+
+        .btn.word-btn {
+            background-color: #2c2c2e;
+            color: #30d158;
+            font-size: 14px;
+            border-radius: 18px;
+            aspect-ratio: auto;
+            height: 60px;
+        }
+
+        .double-zero {
+            font-size: 20px;
+        }
+
+        /* Hidden helpers */
+        .indian-words-row {
+            display: none;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            grid-column: span 4;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calc-container">
+    <div class="header">
+        <span id="modeTitle">Standard Calculator</span>
+        <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+        <div class="menu-dropdown" id="menuDropdown">
+            <button onclick="switchMode('standard')">Standard Calc</button>
+            <button onclick="switchMode('indian')">Indian Lakh Mode</button>
+            <button onclick="switchMode('currency')">Currency Converter</button>
+        </div>
+    </div>
+
+    <div class="display-area">
+        <input type="text" class="calc-input" id="mainDisplay" readonly value="0">
+
+        <div class="currency-box-container" id="currencyBox">
+            <div class="currency-inputs">
+                <div class="currency-card" id="cardTop">
+                    <div class="currency-label" id="lblTop">US Dollar USD ></div>
+                    <input type="text" class="currency-val" id="valTop" readonly value="0">
+                </div>
+                <div class="currency-card" id="cardBottom">
+                    <div class="currency-label" id="lblBottom">Indian Rupee INR ></div>
+                    <input type="text" class="currency-val" id="valBottom" readonly value="0">
+                </div>
+            </div>
+            <div class="currency-swap" onclick="swapCurrency()">⇅</div>
+        </div>
+        <div class="api-status" id="apiTimestamp"></div>
+    </div>
+
+    <div class="keypad">
+        <div class="indian-words-row" id="indianRow">
+            <button class="btn word-btn" onclick="appendWord('Thousand')">Thousand</button>
+            <button class="btn word-btn" onclick="appendWord('Lakh')">Lakh</button>
+            <button class="btn word-btn" onclick="appendWord('Crore')">Crore</button>
+        </div>
+
+        <button class="btn action" id="clearBtn" onclick="pressClear()">AC</button>
+        <button class="btn action" id="pctBtn" onclick="pressOperator('%')">%</button>
+        <button class="btn action" id="backspaceBtn" onclick="pressBackspace()">⌫</button>
+        <button class="btn operator" id="divBtn" onclick="pressOperator('/')">÷</button>
+
+        <button class="btn" onclick="pressNum('7')">7</button>
+        <button class="btn" onclick="pressNum('8')">8</button>
+        <button class="btn" onclick="pressNum('9')">9</button>
+        <button class="btn operator" id="mulBtn" onclick="pressOperator('*')">×</button>
+
+        <button class="btn" onclick="pressNum('4')">4</button>
+        <button class="btn" onclick="pressNum('5')">5</button>
+        <button class="btn" onclick="pressNum('6')">6</button>
+        <button class="btn operator" id="subBtn" onclick="pressOperator('-')">-</button>
+
+        <button class="btn" onclick="pressNum('1')">1</button>
+        <button class="btn" onclick="pressNum('2')">2</button>
+        <button class="btn" onclick="pressNum('3')">3</button>
+        <button class="btn operator" id="addBtn" onclick="pressOperator('+')">+</button>
+
+        <button class="btn double-zero" onclick="pressNum('00')">00</button>
+        <button class="btn" onclick="pressNum('0')">0</button>
+        <button class="btn" onclick="pressNum('.')">.</button>
+        <button class="btn operator" id="equalBtn" onclick="pressEqual()">=</button>
+    </div>
+</div>
+
+<script>
+    let currentMode = 'standard'; // standard, indian, currency
+    let mainDisplay = document.getElementById('mainDisplay');
+    let usdToInrRate = 83.50; // Dynamic backup baseline rate
+    let activeCurrencyInput = 'top'; // tracks which field is active in conversion
+    let isTopUSD = true; 
+
+    // Auto-fetch real-time exchange rates on startup safely
+    async function fetchRates() {
+        try {
+            let res = await fetch('https://open.er-api.com/v6/latest/USD');
+            let data = await res.json();
+            if(data && data.rates && data.rates.INR) {
+                usdToInrRate = data.rates.INR;
+                let now = new Date();
+                document.getElementById('apiTimestamp').innerText = `Last updated: ${now.toLocaleDateString()} ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}).toLowerCase()}`;
+            }
+        } catch(e) {
+            document.getElementById('apiTimestamp').innerText = "Using baseline local rates.";
+        }
+    }
+    fetchRates();
+
+    function toggleMenu() {
+        let dropdown = document.getElementById('menuDropdown');
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        toggleMenu();
+        pressClear();
+        
+        // UI Layout Resets
+        document.getElementById('indianRow').style.display = (mode === 'indian') ? 'grid' : 'none';
+        document.getElementById('currencyBox').style.display = (mode === 'currency') ? 'flex' : 'none';
+        mainDisplay.style.display = (mode === 'currency') ? 'none' : 'block';
+
+        // Operator Visibility adjustments for Currency Converter Mode
+        const ops = ['pctBtn', 'divBtn', 'mulBtn', 'subBtn', 'addBtn', 'equalBtn'];
+        ops.forEach(id => {
+            document.getElementById(id).style.visibility = (mode === 'currency') ? 'hidden' : 'visible';
+        });
+
+        // Set title layout
+        if(mode === 'standard') document.getElementById('modeTitle').innerText = "Standard Calculator";
+        if(mode === 'indian') document.getElementById('modeTitle').innerText = "Indian Lakh Mode";
+        if(mode === 'currency') {
+            document.getElementById('modeTitle').innerText = "Currency converter";
+            activeCurrencyInput = 'top';
+            highlightActiveCard();
+        }
+    }
+
+    function pressNum(num) {
+        if(currentMode === 'currency') {
+            let activeField = activeCurrencyInput === 'top' ? document.getElementById('valTop') : document.getElementById('valBottom');
+            if(activeField.value === '0' && num !== '.') {
+                activeField.value = num;
+            } else {
+                activeField.value += num;
+            }
+            calculateCurrency(activeCurrencyInput);
+            return;
+        }
+
+        // Standard and Indian Input logic
+        if (mainDisplay.value === '0') {
+            mainDisplay.value = num;
+        } else {
+            mainDisplay.value += num;
+        }
+    }
+
+    function appendWord(word) {
+        let val = mainDisplay.value;
+        let lastChar = val.trim().slice(-1);
+        if(!isNaN(lastChar) && val !== '0') {
+            mainDisplay.value += " " + word + " ";
+        }
+    }
+
+    function pressOperator(op) {
+        if(currentMode === 'currency') return;
+        let val = mainDisplay.value;
+        if(val === '0' || val === 'Error') return;
+        mainDisplay.value += " " + op + " ";
+    }
+
+    function pressClear() {
+        mainDisplay.value = '0';
+        document.getElementById('valTop').value = '0';
+        document.getElementById('valBottom').value = '0';
+    }
+
+    function pressBackspace() {
+        if(currentMode === 'currency') {
+            let activeField = activeCurrencyInput === 'top' ? document.getElementById('valTop') : document.getElementById('valBottom');
+            activeField.value = activeField.value.slice(0, -1);
+            if(activeField.value === '') activeField.value = '0';
+            calculateCurrency(activeCurrencyInput);
+            return;
+        }
+        
+        let val = mainDisplay.value.trim();
+        if(val.endsWith('Thousand') || val.endsWith('Lakh') || val.endsWith('Crore')) {
+            let tokens = val.split(" ");
+            tokens.pop();
+            mainDisplay.value = tokens.join(" ");
+        } else {
+            mainDisplay.value = mainDisplay.value.slice(0, -1);
+        }
+        if(mainDisplay.value === '') mainDisplay.value = '0';
+    }
+
+    // Advanced Parser for converting texts dynamically into absolute values
+    function parseIndianSystem(str) {
+        let tokens = str.split(/([\+\-\*\/%])/);
+        for (let i = 0; i < tokens.length; i++) {
+            let segment = tokens[i].trim();
+            if (!segment || ["+", "-", "*", "/", "%"].includes(segment)) continue;
+
+            let chunkVal = 0;
+            let croreMatch = segment.match(/([0-9.]+)\s*Crore/i);
+            if(croreMatch) chunkVal += parseFloat(croreMatch[1]) * 10000000;
+
+            let lakhMatch = segment.match(/([0-9.]+)\s*Lakh/i);
+            if(lakhMatch) chunkVal += parseFloat(lakhMatch[1]) * 100000;
+
+            let thousandMatch = segment.match(/([0-9.]+)\s*Thousand/i);
+            if(thousandMatch) chunkVal += parseFloat(thousandMatch[1]) * 1000;
+
+            // Gather base remaining numbers
+            let cleanStr = segment.replace(/[0-9.]+\s*Crore/i, "")
+                                  .replace(/[0-9.]+\s*Lakh/i, "")
+                                  .replace(/[0-9.]+\s*Thousand/i, "").trim();
+            if (cleanStr && !isNaN(cleanStr)) {
+                chunkVal += parseFloat(cleanStr);
+            }
+
+            if(croreMatch || lakhMatch || thousandMatch) {
+                tokens[i] = chunkVal.toString();
+            }
+        }
+        return tokens.join(" ");
+    }
+
+    function pressEqual() {
+        if(currentMode === 'currency') return;
+        try {
+            let evalString = mainDisplay.value;
+            if(currentMode === 'indian') {
+                evalString = parseIndianSystem(evalString);
+            }
+            // Parse percentages
+            evalString = evalString.replace(/([0-9.]+)\s*%/g, "($1/100)");
+            
+            let res = new Function(`return (${evalString})`)();
+            if (res % 1 !== 0) res = parseFloat(res.toFixed(4));
+            mainDisplay.value = res;
+        } catch(e) {
+            mainDisplay.value = "Error";
+        }
+    }
+
+    // Currency Conversion Processing Engine
+    function calculateCurrency(source) {
+        let topVal = parseFloat(document.getElementById('valTop').value) || 0;
+        let bottomVal = parseFloat(document.getElementById('valBottom').value) || 0;
+
+        if(source === 'top') {
+            if(isTopUSD) {
+                document.getElementById('valBottom').value = (topVal * usdToInrRate).toFixed(2);
+            } else {
+                document.getElementById('valBottom').value = (topVal / usdToInrRate).toFixed(4);
+            }
+        } else {
+            if(isTopUSD) {
+                document.getElementById('valTop').value = (bottomVal / usdToInrRate).toFixed(4);
+            } else {
+                document.getElementById('valTop').value = (bottomVal * usdToInrRate).toFixed(2);
+            }
+        }
+    }
+
+    function swapCurrency() {
+        isTopUSD = !isTopUSD;
+        let lblTop = document.getElementById('lblTop');
+        let lblBottom = document.getElementById('lblBottom');
+        
+        if(isTopUSD) {
+            lblTop.innerText = "US Dollar USD >";
+            lblBottom.innerText = "Indian Rupee INR >";
+        } else {
+            lblTop.innerText = "Indian Rupee INR >";
+            lblBottom.innerText = "US Dollar USD >";
+        }
+        pressClear();
+    }
+
+    function highlightActiveCard() {
+        document.getElementById('cardTop').style.border = activeCurrencyInput === 'top' ? '1px solid #ff9f0a' : 'none';
+        document.getElementById('cardBottom').style.border = activeCurrencyInput === 'bottom' ? '1px solid #ff9f0a' : 'none';
+    }
+
+    // Setup input listeners to allow selection/typing changes
+    document.getElementById('cardTop').addEventListener('click', () => {
+        activeCurrencyInput = 'top';
+        highlightActiveCard();
+    });
+    document.getElementById('cardBottom').addEventListener('click', () => {
+        activeCurrencyInput = 'bottom';
+        highlightActiveCard();
+    });
+    
+    // Allow touch selection and make text editable natively via standard interactions
+    mainDisplay.removeAttribute('readonly');
+    document.getElementById('valTop').removeAttribute('readonly');
+    document.getElementById('valBottom').removeAttribute('readonly');
+</script>
+</body>
+</html>
