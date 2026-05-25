@@ -52,6 +52,7 @@
             color: #ffffff;
             border-bottom: 1px solid #2c2c2e;
             margin-bottom: 10px;
+            position: relative;
         }
 
         .header-actions {
@@ -64,11 +65,12 @@
             background: none;
             border: none;
             color: #ff9f0a;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
             padding: 5px;
             display: flex;
             align-items: center;
+            user-select: none;
         }
 
         .menu-btn {
@@ -78,17 +80,18 @@
             font-size: 26px;
             cursor: pointer;
             padding: 5px;
+            user-select: none;
         }
 
         .menu-dropdown {
             display: none;
             position: absolute;
-            top: 75px;
-            right: 24px;
+            top: 55px;
+            right: 0;
             background-color: #2c2c2e;
             border-radius: 14px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            z-index: 100;
+            z-index: 200;
             width: 210px;
             overflow: hidden;
             border: 1px solid #3a3a3c;
@@ -218,6 +221,7 @@
             font-size: 32px;
             width: 100%;
             outline: none;
+            pointer-events: none; /* Block native input keyboard triggers */
         }
 
         .currency-swap {
@@ -231,6 +235,7 @@
             font-size: 26px;
             color: #ff9f0a;
             border: 1px solid #3a3a3c;
+            user-select: none;
         }
 
         .api-status {
@@ -338,9 +343,11 @@
 <body>
 
 <div class="calc-container">
+    <!-- Navbar Header with Scientific Toggle Icon & 3-Dots Menu -->
     <div class="header">
         <span id="modeTitle">Standard Calculator</span>
         <div class="header-actions">
+            <!-- Dynamic Scientific mode toggle button matching video profile -->
             <button class="sci-toggle-btn" id="sciToggle" onclick="toggleScientificMode()">🔬</button>
             <button class="menu-btn" onclick="toggleMenu()">⋮</button>
         </div>
@@ -351,19 +358,21 @@
         </div>
     </div>
 
+    <!-- Processing Screen Panels -->
     <div class="display-area">
         <input type="text" class="calc-input" id="mainDisplay" value="0" readonly>
         <div class="calc-sub-output" id="subDisplay"></div>
         <div class="breakdown-box" id="breakdownContainer"></div>
 
+        <!-- Currency conversion system display panel -->
         <div class="currency-box-container" id="currencyBox">
             <div class="currency-inputs">
-                <div class="currency-card" id="cardTop">
-                    <div class="currency-label" id="lblTop">US Dollar USD ></div>
+                <div class="currency-card" id="cardTop" onclick="setActiveCard('top')">
+                    <div class="currency-label" id="lblTop">US Dollar USD &gt;</div>
                     <input type="text" class="currency-val" id="valTop" value="0" readonly>
                 </div>
-                <div class="currency-card" id="cardBottom">
-                    <div class="currency-label" id="lblBottom">Indian Rupee INR ></div>
+                <div class="currency-card" id="cardBottom" onclick="setActiveCard('bottom')">
+                    <div class="currency-label" id="lblBottom">Indian Rupee INR &gt;</div>
                     <input type="text" class="currency-val" id="valBottom" value="0" readonly>
                 </div>
             </div>
@@ -372,6 +381,7 @@
         <div class="api-status" id="apiTimestamp"></div>
     </div>
 
+    <!-- Extra Collapsible Scientific Functional Rows Layout -->
     <div class="scientific-row-block" id="sciRow1">
         <button class="sci-btn" onclick="pressSciToken('(')">(</button>
         <button class="sci-btn" onclick="pressSciToken(')')">)</button>
@@ -387,6 +397,7 @@
         <button class="sci-btn" onclick="pressSciToken('ln(')">ln</button>
     </div>
 
+    <!-- Indian Metric Words Row -->
     <div class="indian-words-row" id="indianRow">
         <button class="word-btn" onclick="pressWord('Hundred')">Hundred</button>
         <button class="word-btn" onclick="pressWord('Thousand')">Thousand</button>
@@ -394,6 +405,7 @@
         <button class="word-btn" onclick="pressWord('Crore')">Crore</button>
     </div>
 
+    <!-- Main Input Grid Matrix Panel -->
     <div class="keypad">
         <button class="btn action" onclick="pressClear()">AC</button>
         <button class="btn action" id="pctBtn" onclick="pressOperator('%')">%</button>
@@ -426,9 +438,9 @@
     let currentMode = 'standard';
     let isSciOpen = false;
     
-    let mainDisplay = document.getElementById('mainDisplay');
-    let subDisplay = document.getElementById('subDisplay');
-    let breakdownContainer = document.getElementById('breakdownContainer');
+    const mainDisplay = document.getElementById('mainDisplay');
+    const subDisplay = document.getElementById('subDisplay');
+    const breakdownContainer = document.getElementById('breakdownContainer');
     
     let rawStandardExpression = ""; 
     let indianTokens = []; 
@@ -452,15 +464,14 @@
     fetchRates();
 
     function toggleMenu() {
-        let dropdown = document.getElementById('menuDropdown');
+        const dropdown = document.getElementById('menuDropdown');
         dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
     }
 
-    // Expand/Collapse Scientific Buttons Matrix Row layers smoothly
     function toggleScientificMode() {
         if(currentMode === 'currency') return;
         isSciOpen = !isSciOpen;
-        let displayState = isSciOpen ? 'grid' : 'none';
+        const displayState = isSciOpen ? 'grid' : 'none';
         document.getElementById('sciRow1').style.display = displayState;
         document.getElementById('sciRow2').style.display = displayState;
         document.getElementById('sciToggle').style.color = isSciOpen ? '#30d158' : '#ff9f0a';
@@ -468,10 +479,9 @@
 
     function switchMode(mode) {
         currentMode = mode;
-        toggleMenu();
+        document.getElementById('menuDropdown').style.display = 'none';
         pressClear();
         
-        // Scientific toggle hidden automatically if entering currency mode matrix
         document.getElementById('sciToggle').style.visibility = (mode === 'currency') ? 'hidden' : 'visible';
         if(mode === 'currency' && isSciOpen) toggleScientificMode();
 
@@ -494,3 +504,295 @@
             highlightActiveCard();
         }
     }
+
+    function formatIndianNumber(num) {
+        if (!num || isNaN(num)) return num;
+        let str = num.toString().replace(/,/g, '');
+        let parts = str.split('.');
+        let x = parts[0];
+        let lastThree = x.substring(x.length - 3);
+        let otherNumbers = x.substring(0, x.length - 3);
+        if (otherNumbers != '') lastThree = ',' + lastThree;
+        let res = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+        if (parts.length > 1) res += '.' + parts[1];
+        return res;
+    }
+
+    function convertToIndianWordsString(num) {
+        let val = Math.abs(parseFloat(num));
+        if (isNaN(val) || val === 0) return "0";
+        let prefix = parseFloat(num) < 0 ? "-" : "";
+        let crore = 10000000, lakh = 100000, thousand = 1000, hundred = 100;
+
+        if (val >= crore) return prefix + (val / crore).toFixed(2) + " Crore";
+        if (val >= lakh) return prefix + (val / lakh).toFixed(2) + " Lakh";
+        if (val >= thousand) return prefix + (val / thousand).toFixed(2) + " Thousand";
+        if (val >= hundred) return prefix + (val / hundred).toFixed(2) + " Hundred";
+        return prefix + formatIndianNumber(val);
+    }
+
+    function pressNum(num) {
+        if(currentMode === 'currency') {
+            let field = activeCurrencyInput === 'top' ? document.getElementById('valTop') : document.getElementById('valBottom');
+            if(field.value === '0' && num !== '.') field.value = num;
+            else field.value += num;
+            calculateCurrency(activeCurrencyInput);
+            return;
+        }
+
+        if(currentMode === 'standard') {
+            if(rawStandardExpression === "0" && num !== '.') rawStandardExpression = num;
+            else rawStandardExpression += num;
+            renderStandardRealTime();
+        } else {
+            currentIndianBuffer += num;
+            renderIndianRealTime();
+        }
+    }
+
+    function pressSciToken(token) {
+        if(currentMode === 'currency') return;
+        if(currentMode === 'standard') {
+            rawStandardExpression += token;
+            renderStandardRealTime();
+        } else {
+            if(currentIndianBuffer !== "") {
+                indianTokens.push({ type: 'value', number: currentIndianBuffer, suffix: '' });
+                currentIndianBuffer = "";
+            }
+            indianTokens.push({ type: 'sci', token: token });
+            renderIndianRealTime();
+        }
+    }
+
+    function pressWord(word) {
+        if (currentMode !== 'indian' || currentIndianBuffer === "") return;
+        indianTokens.push({ type: 'value', number: currentIndianBuffer, suffix: word });
+        currentIndianBuffer = "";
+        renderIndianRealTime();
+    }
+
+    function pressOperator(op) {
+        if(currentMode === 'currency') return;
+        if(currentMode === 'standard') {
+            if(rawStandardExpression === "") return;
+            let last = rawStandardExpression.slice(-1);
+            if(["+", "-", "*", "/", "%"].includes(last)) {
+                rawStandardExpression = rawStandardExpression.slice(0, -1) + op;
+            } else {
+                rawStandardExpression += op;
+            }
+            renderStandardRealTime();
+        } else {
+            if (currentIndianBuffer !== "") {
+                indianTokens.push({ type: 'value', number: currentIndianBuffer, suffix: '' });
+                currentIndianBuffer = "";
+            }
+            if (indianTokens.length === 0) return;
+            let lastToken = indianTokens[indianTokens.length - 1];
+            if (lastToken.type === 'operator') {
+                lastToken.char = op;
+            } else {
+                indianTokens.push({ type: 'operator', char: op });
+            }
+            renderIndianRealTime();
+        }
+    }
+
+    function pressClear() {
+        rawStandardExpression = "";
+        indianTokens = [];
+        currentIndianBuffer = "";
+        mainDisplay.value = "0";
+        subDisplay.innerText = "";
+        breakdownContainer.innerHTML = "";
+        document.getElementById('valTop').value = '0';
+        document.getElementById('valBottom').value = '0';
+    }
+
+    function pressBackspace() {
+        if(currentMode === 'currency') {
+            let field = activeCurrencyInput === 'top' ? document.getElementById('valTop') : document.getElementById('valBottom');
+            field.value = field.value.slice(0, -1);
+            if(field.value === '') field.value = '0';
+            calculateCurrency(activeCurrencyInput);
+            return;
+        }
+
+        if(currentMode === 'standard') {
+            let matched = false;
+            const longTokens = ["sin(", "cos(", "tan(", "log(", "ln(", "√("];
+            for(let t of longTokens) {
+                if(rawStandardExpression.endsWith(t)) {
+                    rawStandardExpression = rawStandardExpression.slice(0, -t.length);
+                    matched = true; break;
+                }
+            }
+            if(!matched) rawStandardExpression = rawStandardExpression.slice(0, -1);
+            renderStandardRealTime();
+        } else {
+            if (currentIndianBuffer !== "") {
+                currentIndianBuffer = currentIndianBuffer.slice(0, -1);
+            } else if (indianTokens.length > 0) {
+                let popped = indianTokens.pop();
+                if (popped.type === 'value') currentIndianBuffer = popped.number;
+            }
+            renderIndianRealTime();
+        }
+    }
+
+    function evaluateAdvancedMathString(expr) {
+        let clean = expr.replace(/×/g, '*').replace(/÷/g, '/')
+                        .replace(/π/g, 'Math.PI')
+                        .replace(/e/g, 'Math.E')
+                        .replace(/([0-9.]+)\s*%/g, "($1/100)");
+        
+        clean = clean.replace(/sin\(/g, 'Math.sin(')
+                     .replace(/cos\(/g, 'Math.cos(')
+                     .replace(/tan\(/g, 'Math.tan(')
+                     .replace(/log\(/g, 'Math.log10(')
+                     .replace(/ln\(/g, 'Math.log(')
+                     .replace(/√\(/g, 'Math.sqrt(');
+        
+        return new Function(`return (${clean})`)();
+    }
+
+    function renderStandardRealTime() {
+        if(rawStandardExpression === "") {
+            mainDisplay.value = "0";
+            subDisplay.innerText = "";
+            return;
+        }
+        mainDisplay.value = rawStandardExpression;
+
+        try {
+            let expr = rawStandardExpression;
+            let lastChar = expr.slice(-1);
+            if(["+", "-", "*", "/", "%"].includes(lastChar)) expr = expr.slice(0, -1);
+            
+            let res = evaluateAdvancedMathString(expr);
+            if(res !== undefined && !isNaN(res)) subDisplay.innerText = formatIndianNumber(res.toString());
+        } catch(e) {}
+    }
+
+    function renderIndianRealTime() {
+        let displayStringArr = [];
+        indianTokens.forEach(t => {
+            if (t.type === 'value') displayStringArr.push(`${t.number} ${t.suffix}`.trim());
+            else if (t.type === 'operator') displayStringArr.push(` ${t.char} `);
+            else displayStringArr.push(t.token);
+        });
+        if (currentIndianBuffer !== "") displayStringArr.push(currentIndianBuffer);
+        mainDisplay.value = displayStringArr.join("") || "0";
+
+        breakdownContainer.innerHTML = "";
+        let multiplierMap = { 'Hundred': 100, 'Thousand': 1000, 'Lakh': 100000, 'Crore': 10000000 };
+        let mathEvaluationArr = [];
+
+        indianTokens.forEach(t => {
+            if (t.type === 'value') {
+                let factor = multiplierMap[t.suffix] || 1;
+                let calcVal = parseFloat(t.number) * factor;
+                mathEvaluationArr.push(calcVal);
+
+                let row = document.createElement('div');
+                row.className = 'breakdown-line';
+                row.innerText = `${t.suffix ? t.suffix + ': ' : ''}${formatIndianNumber(calcVal)}`;
+                breakdownContainer.appendChild(row);
+            } else if (t.type === 'operator') {
+                mathEvaluationArr.push(t.char);
+            } else {
+                mathEvaluationArr.push(t.token);
+            }
+        });
+
+        if (currentIndianBuffer !== "") {
+            let row = document.createElement('div');
+            row.className = 'breakdown-line';
+            row.innerText = formatIndianNumber(currentIndianBuffer);
+            breakdownContainer.appendChild(row);
+            mathEvaluationArr.push(parseFloat(currentIndianBuffer));
+        }
+
+        if (mathEvaluationArr.length > 0) {
+            try {
+                let exprStr = mathEvaluationArr.join("");
+                let totalVal = evaluateAdvancedMathString(exprStr);
+                
+                if(totalVal !== undefined && !isNaN(totalVal)) {
+                    let totalRow = document.createElement('div');
+                    totalRow.className = 'total-line';
+                    totalRow.innerText = `= ${convertToIndianWordsString(totalVal)} (${formatIndianNumber(totalVal.toFixed(2))})`;
+                    breakdownContainer.appendChild(totalRow);
+                }
+            } catch (e) {}
+        }
+        breakdownContainer.scrollTop = breakdownContainer.scrollHeight;
+    }
+
+    function pressEqual() {
+        if(currentMode === 'currency') return;
+        if(currentMode === 'standard') {
+            if(subDisplay.innerText !== "") {
+                mainDisplay.value = subDisplay.innerText;
+                rawStandardExpression = subDisplay.innerText.replace(/,/g, '');
+                subDisplay.innerText = "";
+            }
+        } else {
+            if (breakdownContainer.lastChild && breakdownContainer.lastChild.className === 'total-line') {
+                let rawMatch = breakdownContainer.lastChild.innerText.match(/\(([^)]+)\)/);
+                if (rawMatch) {
+                    let finalVal = rawMatch[1].replace(/,/g, '');
+                    indianTokens = [];
+                    currentIndianBuffer = finalVal;
+                    renderIndianRealTime();
+                }
+            }
+        }
+    }
+
+    function calculateCurrency(source) {
+        let topVal = parseFloat(document.getElementById('valTop').value.replace(/,/g, '')) || 0;
+        let bottomVal = parseFloat(document.getElementById('valBottom').value.replace(/,/g, '')) || 0;
+
+        if(source === 'top') {
+            if(isTopUSD) {
+                document.getElementById('valBottom').value = formatIndianNumber((topVal * usdToInrRate).toFixed(2));
+            } else {
+                document.getElementById('valTop').value = formatIndianNumber((topVal / usdToInrRate).toFixed(4));
+            }
+        } else {
+            if(isTopUSD) {
+                document.getElementById('valTop').value = formatIndianNumber((bottomVal / usdToInrRate).toFixed(4));
+            } else {
+                document.getElementById('valBottom').value = formatIndianNumber((bottomVal * usdToInrRate).toFixed(2));
+            }
+        }
+    }
+
+    function swapCurrency() {
+        isTopUSD = !isTopUSD;
+        let lblTop = document.getElementById('lblTop');
+        let lblBottom = document.getElementById('lblBottom');
+        if(isTopUSD) {
+            lblTop.innerText = "US Dollar USD >";
+            lblBottom.innerText = "Indian Rupee INR >";
+        } else {
+            lblTop.innerText = "Indian Rupee INR >";
+            lblBottom.innerText = "US Dollar USD >";
+        }
+        pressClear();
+    }
+
+    function setActiveCard(card) {
+        activeCurrencyInput = card;
+        highlightActiveCard();
+    }
+
+    function highlightActiveCard() {
+        document.getElementById('cardTop').style.borderColor = activeCurrencyInput === 'top' ? '#ff9f0a' : '#3a3a3c';
+        document.getElementById('cardBottom').style.borderColor = activeCurrencyInput === 'bottom' ? '#ff9f0a' : '#3a3a3c';
+    }
+</script>
+</body>
+</html>
