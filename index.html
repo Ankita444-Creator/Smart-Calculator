@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indian Multi-Line Break Calculator</title>
+    <title>Ultimate Indian Smart Calculator</title>
     <style>
         * {
             box-sizing: border-box;
@@ -29,6 +29,7 @@
             display: flex;
             flex-direction: column;
             padding: 24px;
+            position: relative;
         }
 
         @media (min-width: 401px) {
@@ -39,6 +40,7 @@
             }
         }
 
+        /* Top Bar & Dropdown Menu */
         .header {
             display: flex;
             justify-content: space-between;
@@ -48,7 +50,50 @@
             font-weight: 500;
         }
 
-        /* Twin Screen Dynamic Vertical Layout */
+        .menu-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .menu-dropdown {
+            display: none;
+            position: absolute;
+            top: 70px;
+            right: 24px;
+            background-color: #1c1c1e;
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            z-index: 100;
+            width: 200px;
+            overflow: hidden;
+        }
+
+        .menu-dropdown button {
+            display: block;
+            width: 100%;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            color: white;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #2c2c2e;
+        }
+
+        .menu-dropdown button:last-child {
+            border-bottom: none;
+        }
+
+        .menu-dropdown button:hover {
+            background-color: #2c2c2e;
+        }
+
+        /* Responsive Dual Screen Displays */
         .display-area {
             flex-grow: 1;
             display: flex;
@@ -57,29 +102,40 @@
             align-items: flex-end;
             margin-bottom: 20px;
             overflow: hidden;
+            width: 100%;
         }
 
-        /* Oporer Line: Jekhane pure text + number operational string thakbe */
         .calc-input {
             background: none;
             border: none;
             color: #ffffff;
-            font-size: 38px;
+            font-size: 44px;
             text-align: right;
             width: 100%;
             outline: none;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
             font-weight: 400;
         }
 
-        /* Nicher area: Jekhane vertical breakdown and answer line bi line thakbe */
-        .breakdown-box {
+        /* Standard Sub-Output Line */
+        .calc-sub-output {
+            color: #7d7d7d;
+            font-size: 28px;
+            text-align: right;
             width: 100%;
-            display: flex;
+            min-height: 34px;
+            font-weight: 400;
+            display: block;
+        }
+
+        /* Indian Mode Vertical List Breakdown Box */
+        .breakdown-box {
+            display: none;
+            width: 100%;
             flex-direction: column;
             align-items: flex-end;
             gap: 6px;
-            max-height: 200px;
+            max-height: 180px;
             overflow-y: auto;
             border-top: 1px solid #2c2c2e;
             padding-top: 10px;
@@ -88,7 +144,6 @@
         .breakdown-line {
             color: #a5a5a5;
             font-size: 20px;
-            font-weight: 400;
         }
 
         .total-line {
@@ -98,9 +153,68 @@
             margin-top: 4px;
         }
 
-        /* Macro Word Action Buttons Row */
+        /* Currency Cards Layer Layout (Matches User Reference Image) */
+        .currency-box-container {
+            display: none;
+            flex-direction: row;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .currency-inputs {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .currency-card {
+            background-color: #1c1c1e;
+            border-radius: 20px;
+            padding: 18px;
+            cursor: pointer;
+            transition: border 0.1s;
+        }
+
+        .currency-label {
+            color: #8e8e93;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .currency-val {
+            background: none;
+            border: none;
+            color: #ff9f0a;
+            font-size: 34px;
+            width: 100%;
+            outline: none;
+        }
+
+        .currency-swap {
+            width: 65px;
+            background-color: #1c1c1e;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 28px;
+            color: #ff9f0a;
+        }
+
+        .api-status {
+            font-size: 12px;
+            color: #555;
+            text-align: left;
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        /* Custom Label Green Row */
         .indian-words-row {
-            display: grid;
+            display: none;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
             margin-bottom: 16px;
@@ -122,7 +236,7 @@
             filter: brightness(1.4);
         }
 
-        /* Universal Numeric Grid */
+        /* Core Array Grid UI */
         .keypad {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -141,6 +255,7 @@
             justify-content: center;
             align-items: center;
             user-select: none;
+            transition: filter 0.1s;
         }
 
         .btn:active {
@@ -157,74 +272,148 @@
             color: #000000;
             font-weight: 500;
         }
+
+        .double-zero {
+            font-size: 22px;
+        }
     </style>
 </head>
 <body>
 
 <div class="calc-container">
     <div class="header">
-        <span>Indian Lakh Mode</span>
-    </div>
-
-    <!-- Active Display Matrix -->
-    <div class="display-area">
-        <!-- Input line for direct text display like '85 Thousand' -->
-        <input type="text" class="calc-input" id="mainDisplay" value="" placeholder="0" readonly>
-        
-        <!-- Niche niche list dekhano container -->
-        <div class="breakdown-box" id="breakdownContainer">
-            <!-- Dynamic lines will drop here vertically -->
+        <span id="modeTitle">Standard Calculator</span>
+        <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+        <div class="menu-dropdown" id="menuDropdown">
+            <button onclick="switchMode('standard')">Standard Calc</button>
+            <button onclick="switchMode('indian')">Indian Lakh Mode</button>
+            <button onclick="switchMode('currency')">Currency Converter</button>
         </div>
     </div>
 
-    <!-- Word Multipliers -->
-    <div class="indian-words-row">
+    <div class="display-area">
+        <input type="text" class="calc-input" id="mainDisplay" value="0" readonly>
+        
+        <div class="calc-sub-output" id="subDisplay"></div>
+
+        <div class="breakdown-box" id="breakdownContainer"></div>
+
+        <div class="currency-box-container" id="currencyBox">
+            <div class="currency-inputs">
+                <div class="currency-card" id="cardTop">
+                    <div class="currency-label" id="lblTop">US Dollar USD ></div>
+                    <input type="text" class="currency-val" id="valTop" value="0" readonly>
+                </div>
+                <div class="currency-card" id="cardBottom">
+                    <div class="currency-label" id="lblBottom">Indian Rupee INR ></div>
+                    <input type="text" class="currency-val" id="valBottom" value="0" readonly>
+                </div>
+            </div>
+            <div class="currency-swap" onclick="swapCurrency()">⇅</div>
+        </div>
+        <div class="api-status" id="apiTimestamp"></div>
+    </div>
+
+    <div class="indian-words-row" id="indianRow">
         <button class="word-btn" onclick="pressWord('Hundred')">Hundred</button>
         <button class="word-btn" onclick="pressWord('Thousand')">Thousand</button>
         <button class="word-btn" onclick="pressWord('Lakh')">Lakh</button>
         <button class="word-btn" onclick="pressWord('Crore')">Crore</button>
     </div>
 
-    <!-- Standard Core Array Pad -->
     <div class="keypad">
         <button class="btn action" onclick="pressClear()">AC</button>
-        <button class="btn action" onclick="pressOperator('%')">%</button>
+        <button class="btn action" id="pctBtn" onclick="pressOperator('%')">%</button>
         <button class="btn action" onclick="pressBackspace()">⌫</button>
-        <button class="btn operator" onclick="pressOperator('/')">÷</button>
+        <button class="btn operator" id="divBtn" onclick="pressOperator('/')">÷</button>
 
         <button class="btn" onclick="pressNum('7')">7</button>
         <button class="btn" onclick="pressNum('8')">8</button>
         <button class="btn" onclick="pressNum('9')">9</button>
-        <button class="btn operator" onclick="pressOperator('*')">×</button>
+        <button class="btn operator" id="mulBtn" onclick="pressOperator('*')">×</button>
 
         <button class="btn" onclick="pressNum('4')">4</button>
         <button class="btn" onclick="pressNum('5')">5</button>
         <button class="btn" onclick="pressNum('6')">6</button>
-        <button class="btn operator" onclick="pressOperator('-')">-</button>
+        <button class="btn operator" id="subBtn" onclick="pressOperator('-')">-</button>
 
         <button class="btn" onclick="pressNum('1')">1</button>
         <button class="btn" onclick="pressNum('2')">2</button>
         <button class="btn" onclick="pressNum('3')">3</button>
-        <button class="btn operator" onclick="pressOperator('+')">+</button>
+        <button class="btn operator" id="addBtn" onclick="pressOperator('+')">+</button>
 
-        <button class="btn" onclick="pressNum('00')">00</button>
+        <button class="btn double-zero" onclick="pressNum('00')">00</button>
         <button class="btn" onclick="pressNum('0')">0</button>
         <button class="btn" onclick="pressNum('.')">.</button>
-        <button class="btn operator" onclick="pressEqual()">=</button>
+        <button class="btn operator" id="equalBtn" onclick="pressEqual()">=</button>
     </div>
 </div>
 
 <script>
+    let currentMode = 'standard';
     let mainDisplay = document.getElementById('mainDisplay');
+    let subDisplay = document.getElementById('subDisplay');
     let breakdownContainer = document.getElementById('breakdownContainer');
     
-    // Arrays to maintain user inputs cleanly
-    let displayTokens = []; 
-    let currentNumBuffer = "";
+    // Core engine trackers
+    let rawStandardExpression = ""; 
+    let indianTokens = []; 
+    let currentIndianBuffer = "";
+    
+    // Currency Layer Metrics
+    let usdToInrRate = 83.50; 
+    let activeCurrencyInput = 'top'; 
+    let isTopUSD = true;
+
+    async function fetchRates() {
+        try {
+            let res = await fetch('https://open.er-api.com/v6/latest/USD');
+            let data = await res.json();
+            if(data && data.rates && data.rates.INR) {
+                usdToInrRate = data.rates.INR;
+                let now = new Date();
+                document.getElementById('apiTimestamp').innerText = `Last updated: ${now.toLocaleDateString()} ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}).toLowerCase()}`;
+            }
+        } catch(e) {
+            document.getElementById('apiTimestamp').innerText = "Using baseline local rates.";
+        }
+    }
+    fetchRates();
+
+    function toggleMenu() {
+        let dropdown = document.getElementById('menuDropdown');
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        toggleMenu();
+        pressClear();
+        
+        // Setup structural layout styles
+        document.getElementById('indianRow').style.display = (mode === 'indian') ? 'grid' : 'none';
+        document.getElementById('breakdownContainer').style.display = (mode === 'indian') ? 'flex' : 'none';
+        document.getElementById('subDisplay').style.display = (mode === 'standard') ? 'block' : 'none';
+        document.getElementById('currencyBox').style.display = (mode === 'currency') ? 'flex' : 'none';
+        mainDisplay.style.display = (mode === 'currency') ? 'none' : 'block';
+
+        const currencyHiddenOps = ['pctBtn', 'divBtn', 'mulBtn', 'subBtn', 'addBtn'];
+        currencyHiddenOps.forEach(id => {
+            document.getElementById(id).style.visibility = (mode === 'currency') ? 'hidden' : 'visible';
+        });
+
+        if(mode === 'standard') document.getElementById('modeTitle').innerText = "Standard Calculator";
+        if(mode === 'indian') document.getElementById('modeTitle').innerText = "Indian Lakh Mode";
+        if(mode === 'currency') {
+            document.getElementById('modeTitle').innerText = "Currency converter";
+            activeCurrencyInput = 'top';
+            highlightActiveCard();
+        }
+    }
 
     function formatIndianNumber(num) {
         if (!num || isNaN(num)) return num;
-        let str = num.toString();
+        let str = num.toString().replace(/,/g, '');
         let parts = str.split('.');
         let x = parts[0];
         let lastThree = x.substring(x.length - 3);
@@ -236,145 +425,236 @@
     }
 
     function pressNum(num) {
-        currentNumBuffer += num;
-        renderRealTime();
+        if(currentMode === 'currency') {
+            let field = activeCurrencyInput === 'top' ? document.getElementById('valTop') : document.getElementById('valBottom');
+            if(field.value === '0' && num !== '.') field.value = num;
+            else field.value += num;
+            calculateCurrency(activeCurrencyInput);
+            return;
+        }
+
+        if(currentMode === 'standard') {
+            if(rawStandardExpression === "0" && num !== '.') rawStandardExpression = num;
+            else rawStandardExpression += num;
+            renderStandardRealTime();
+        } else {
+            currentIndianBuffer += num;
+            renderIndianRealTime();
+        }
     }
 
     function pressWord(word) {
-        if (currentNumBuffer === "") return;
-        // Token format object maps strings cleanly
-        displayTokens.push({
-            type: 'value',
-            number: currentNumBuffer,
-            suffix: word
-        });
-        currentNumBuffer = "";
-        renderRealTime();
+        if (currentMode !== 'indian' || currentIndianBuffer === "") return;
+        indianTokens.push({ type: 'value', number: currentIndianBuffer, suffix: word });
+        currentIndianBuffer = "";
+        renderIndianRealTime();
     }
 
     function pressOperator(op) {
-        if (currentNumBuffer !== "") {
-            displayTokens.push({ type: 'value', number: currentNumBuffer, suffix: '' });
-            currentNumBuffer = "";
-        }
-        if (displayTokens.length === 0) return;
-        
-        // Handle trailing duplicate operational maps cleanly
-        if (displayTokens[displayTokens.length - 1].type === 'operator') {
-            displayTokens[displayTokens.length - 1].char = op;
+        if(currentMode === 'currency') return;
+
+        if(currentMode === 'standard') {
+            if(rawStandardExpression === "") return;
+            let last = rawStandardExpression.slice(-1);
+            if(["+", "-", "*", "/", "%"].includes(last)) {
+                rawStandardExpression = rawStandardExpression.slice(0, -1) + op;
+            } else {
+                rawStandardExpression += op;
+            }
+            renderStandardRealTime();
         } else {
-            displayTokens.push({ type: 'operator', char: op });
+            // Indian Multi-line operational triggers
+            if (currentIndianBuffer !== "") {
+                indianTokens.push({ type: 'value', number: currentIndianBuffer, suffix: '' });
+                currentIndianBuffer = "";
+            }
+            if (indianTokens.length === 0) return;
+            if (indianTokens[indianTokens.length - 1].type === 'operator') {
+                indianTokens[indianTokens.length - 1].char = op;
+            } else {
+                indianTokens.push({ type: 'operator', char: op });
+            }
+            renderIndianRealTime();
         }
-        renderRealTime();
     }
 
     function pressClear() {
-        displayTokens = [];
-        currentNumBuffer = "";
-        mainDisplay.value = "";
+        rawStandardExpression = "";
+        indianTokens = [];
+        currentIndianBuffer = "";
+        mainDisplay.value = "0";
+        subDisplay.innerText = "";
         breakdownContainer.innerHTML = "";
+        document.getElementById('valTop').value = '0';
+        document.getElementById('valBottom').value = '0';
     }
 
     function pressBackspace() {
-        if (currentNumBuffer !== "") {
-            currentNumBuffer = currentNumBuffer.slice(0, -1);
-        } else if (displayTokens.length > 0) {
-            let popped = displayTokens.pop();
-            if (popped.type === 'value') {
-                currentNumBuffer = popped.number; // Bring back into modification layer
-            }
+        if(currentMode === 'currency') {
+            let field = activeCurrencyInput === 'top' ? document.getElementById('valTop') : document.getElementById('valBottom');
+            field.value = field.value.slice(0, -1);
+            if(field.value === '') field.value = '0';
+            calculateCurrency(activeCurrencyInput);
+            return;
         }
-        renderRealTime();
+
+        if(currentMode === 'standard') {
+            rawStandardExpression = rawStandardExpression.slice(0, -1);
+            renderStandardRealTime();
+        } else {
+            if (currentIndianBuffer !== "") {
+                currentIndianBuffer = currentIndianBuffer.slice(0, -1);
+            } else if (indianTokens.length > 0) {
+                let popped = indianTokens.pop();
+                if (popped.type === 'value') currentIndianBuffer = popped.number;
+            }
+            renderIndianRealTime();
+        }
     }
 
-    // Core Real-Time Engine processing action events
-    function renderRealTime() {
-        // 1. Build string format for the top line
-        let topStringArr = [];
-        displayTokens.forEach(t => {
-            if (t.type === 'value') {
-                topStringArr.push(`${t.number} ${t.suffix}`.trim());
-            } else {
-                topStringArr.push(` ${t.char} `);
-            }
-        });
-        if (currentNumBuffer !== "") {
-            topStringArr.push(currentNumBuffer);
+    // Standard Real-Time Layout Processor (Matches normal mobile experience)
+    function renderStandardRealTime() {
+        if(rawStandardExpression === "") {
+            mainDisplay.value = "0";
+            subDisplay.innerText = "";
+            return;
         }
-        mainDisplay.value = topStringArr.join("");
+        let tokens = rawStandardExpression.split(/([\+\-\*\/%])/);
+        for(let i=0; i<tokens.length; i++) {
+            if(tokens[i] && !["+", "-", "*", "/", "%"].includes(tokens[i])) {
+                tokens[i] = formatIndianNumber(tokens[i]);
+            }
+        }
+        mainDisplay.value = tokens.join("");
 
-        // 2. Clear breakdown lines to reconstruct clean DOM tree rows vertically
+        // Sub-output instant update logic
+        try {
+            let expr = rawStandardExpression;
+            if(["+", "-", "*", "/", "%"].includes(expr.slice(-1))) expr = expr.slice(0, -1);
+            expr = expr.replace(/([0-9.]+)\s*%/g, "($1/100)");
+            let res = new Function(`return (${expr})`)();
+            if(res !== undefined) subDisplay.innerText = formatIndianNumber(res.toString());
+        } catch(e) {}
+    }
+
+    // Indian Mode Vertical Line-By-Line Engine
+    function renderIndianRealTime() {
+        let topStringArr = [];
+        indianTokens.forEach(t => {
+            if (t.type === 'value') topStringArr.push(`${t.number} ${t.suffix}`.trim());
+            else topStringArr.push(` ${t.char} `);
+        });
+        if (currentIndianBuffer !== "") topStringArr.push(currentIndianBuffer);
+        mainDisplay.value = topStringArr.join("") || "0";
+
         breakdownContainer.innerHTML = "";
-
         let multiplierMap = { 'Hundred': 100, 'Thousand': 1000, 'Lakh': 100000, 'Crore': 10000000 };
-        let mathExpressionArr = [];
-        let runningTotal = 0;
+        let mathArr = [];
 
-        // Process existing tokens
-        displayTokens.forEach(t => {
+        indianTokens.forEach(t => {
             if (t.type === 'value') {
                 let factor = multiplierMap[t.suffix] || 1;
-                let calculatedValue = parseFloat(t.number) * factor;
-                mathExpressionArr.push(calculatedValue);
+                let calcVal = parseFloat(t.number) * factor;
+                mathArr.push(calcVal);
 
-                // Add formatted number line vertically
                 let row = document.createElement('div');
                 row.className = 'breakdown-line';
-                row.innerText = `${t.suffix ? t.suffix + ': ' : ''}${formatIndianNumber(calculatedValue)}`;
+                row.innerText = `${t.suffix ? t.suffix + ': ' : ''}${formatIndianNumber(calcVal)}`;
                 breakdownContainer.appendChild(row);
             } else {
-                mathExpressionArr.push(t.char);
+                mathArr.push(t.char);
             }
         });
 
-        // Add currently typing buffer line into vertical layout stack
-        if (currentNumBuffer !== "") {
+        if (currentIndianBuffer !== "") {
             let row = document.createElement('div');
             row.className = 'breakdown-line';
-            row.innerText = formatIndianNumber(currentNumBuffer);
+            row.innerText = formatIndianNumber(currentIndianBuffer);
             breakdownContainer.appendChild(row);
-            mathExpressionArr.push(parseFloat(currentNumBuffer));
+            mathArr.push(parseFloat(currentIndianBuffer));
         }
 
-        // 3. Evaluate total logic stream natively 
-        if (mathExpressionArr.length > 0) {
+        if (mathArr.length > 0) {
             try {
-                let lastElement = mathExpressionArr[mathExpressionArr.length - 1];
-                if (['+', '-', '*', '/', '%'].includes(lastElement)) {
-                    mathExpressionArr.pop(); // Temp strip trails for evaluation breaks
-                }
+                let last = mathArr[mathArr.length - 1];
+                if (['+', '-', '*', '/', '%'].includes(last)) mathArr.pop();
+                let totalVal = new Function(`return (${mathArr.join("").replace(/×/g, '*').replace(/÷/g, '/')})`)();
                 
-                let exprString = mathExpressionArr.join("")
-                                                  .replace(/×/g, '*')
-                                                  .replace(/÷/g, '/');
-                
-                if(exprString.trim() !== "") {
-                    let totalVal = new Function(`return (${exprString})`)();
-                    if (totalVal % 1 !== 0) totalVal = parseFloat(totalVal.toFixed(4));
-
-                    // Final Total Line right at the bottom
-                    let totalRow = document.createElement('div');
-                    totalRow.className = 'total-line';
-                    totalRow.innerText = `= ${formatIndianNumber(totalVal)}`;
-                    breakdownContainer.appendChild(totalRow);
-                }
-            } catch (e) {
-                // Quiet mid-flow catch logs
-            }
+                let totalRow = document.createElement('div');
+                totalRow.className = 'total-line';
+                totalRow.innerText = `= ${formatIndianNumber(totalVal)}`;
+                breakdownContainer.appendChild(totalRow);
+            } catch (e) {}
         }
-        
-        // Auto scroll container to view newest entries safely
         breakdownContainer.scrollTop = breakdownContainer.scrollHeight;
     }
 
     function pressEqual() {
-        if (breakdownContainer.lastChild && breakdownContainer.lastChild.className === 'total-line') {
-            let finalValueStr = breakdownContainer.lastChild.innerText.replace('= ', '').replace(/,/g, '');
-            displayTokens = [];
-            currentNumBuffer = finalValueStr;
-            renderRealTime();
+        if(currentMode === 'currency') return;
+
+        if(currentMode === 'standard') {
+            if(subDisplay.innerText !== "") {
+                mainDisplay.value = subDisplay.innerText;
+                rawStandardExpression = subDisplay.innerText.replace(/,/g, '');
+                subDisplay.innerText = "";
+            }
+        } else {
+            if (breakdownContainer.lastChild && breakdownContainer.lastChild.className === 'total-line') {
+                let finalVal = breakdownContainer.lastChild.innerText.replace('= ', '').replace(/,/g, '');
+                indianTokens = [];
+                currentIndianBuffer = finalVal;
+                renderIndianRealTime();
+            }
         }
     }
+
+    function calculateCurrency(source) {
+        let topVal = parseFloat(document.getElementById('valTop').value) || 0;
+        let bottomVal = parseFloat(document.getElementById('valBottom').value) || 0;
+
+        if(source === 'top') {
+            if(isTopUSD) {
+                document.getElementById('valBottom').value = formatIndianNumber((topVal * usdToInrRate).toFixed(2));
+            } else {
+                document.getElementById('valTop').value = formatIndianNumber((topVal / usdToInrRate).toFixed(4));
+            }
+        } else {
+            if(isTopUSD) {
+                document.getElementById('valTop').value = formatIndianNumber((bottomVal / usdToInrRate).toFixed(4));
+            } else {
+                document.getElementById('valBottom').value = formatIndianNumber((bottomVal * usdToInrRate).toFixed(2));
+            }
+        }
+    }
+
+    function swapCurrency() {
+        isTopUSD = !isTopUSD;
+        let lblTop = document.getElementById('lblTop');
+        let lblBottom = document.getElementById('lblBottom');
+        
+        if(isTopUSD) {
+            lblTop.innerText = "US Dollar USD >";
+            lblBottom.innerText = "Indian Rupee INR >";
+        } else {
+            lblTop.innerText = "Indian Rupee INR >";
+            lblBottom.innerText = "US Dollar USD >";
+        }
+        pressClear();
+    }
+
+    function highlightActiveCard() {
+        document.getElementById('cardTop').style.border = activeCurrencyInput === 'top' ? '1px solid #ff9f0a' : 'none';
+        document.getElementById('cardBottom').style.border = activeCurrencyInput === 'bottom' ? '1px solid #ff9f0a' : 'none';
+    }
+
+    document.getElementById('cardTop').addEventListener('click', () => {
+        activeCurrencyInput = 'top';
+        highlightActiveCard();
+    });
+    document.getElementById('cardBottom').addEventListener('click', () => {
+        activeCurrencyInput = 'bottom';
+        highlightActiveCard();
+    });
 </script>
 </body>
 </html>
