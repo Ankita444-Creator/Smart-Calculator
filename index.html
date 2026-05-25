@@ -20,74 +20,66 @@
             align-items: center;
             min-height: 100vh;
             color: #ffffff;
-            overflow: hidden;
+            padding: 0;
         }
 
-        /* Responsive Wrapper for Mobile & Desktop */
+        /* Fixed Mobile Bottom-Cut & Top Overflow Engine */
         .calc-container {
             background-color: #1c1c1e;
             width: 100%;
             max-width: 440px;
+            /* dynamically handles mobile web address bars without overflows */
             height: 100vh;
+            height: -webkit-fill-available; 
             display: flex;
             flex-direction: column;
-            padding: 16px 20px 24px 20px;
+            padding: 12px 16px 16px 16px;
             position: relative;
+            overflow: hidden;
         }
 
         @media (min-width: 441px) {
             .calc-container {
-                height: 860px;
-                border-radius: 36px;
+                height: 840px;
+                border-radius: 32px;
                 border: 1px solid #2c2c2e;
                 box-shadow: 0 25px 60px rgba(0,0,0,0.8);
             }
         }
 
-        /* Top Header Navigation Section */
+        /* Top Action Bar Protection */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 4px 0 10px 0;
+            padding: 4px 4px 10px 4px;
             font-size: 20px;
             font-weight: 600;
             color: #ffffff;
             border-bottom: 1px solid #2c2c2e;
-            min-height: 44px;
+            flex-shrink: 0; 
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
         }
 
-        .sci-toggle-btn {
+        .sci-toggle-btn, .menu-btn {
             background: none;
             border: none;
             color: #ff9f0a;
-            font-size: 22px;
+            font-size: 24px;
             cursor: pointer;
-            padding: 6px;
-            display: flex;
-            align-items: center;
-        }
-
-        .menu-btn {
-            background: none;
-            border: none;
-            color: #ff9f0a;
-            font-size: 26px;
-            cursor: pointer;
-            padding: 6px;
+            padding: 4px;
         }
 
         .menu-dropdown {
             display: none;
             position: absolute;
-            top: 60px;
-            right: 20px;
+            top: 55px;
+            right: 16px;
             background-color: #2c2c2e;
             border-radius: 14px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
@@ -100,7 +92,7 @@
         .menu-dropdown button {
             display: block;
             width: 100%;
-            padding: 15px 20px;
+            padding: 14px 18px;
             background: none;
             border: none;
             color: #ffffff;
@@ -114,27 +106,27 @@
             border-bottom: none;
         }
 
-        /* Dynamic Expandable Black Screen Panel */
+        /* Flex Resizable Dynamic Black Box Screen */
         .display-area {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             align-items: flex-end;
-            margin: 12px 0;
-            min-height: 160px;
+            margin: 8px 0;
             background-color: #000000;
             border-radius: 20px;
-            padding: 16px;
+            padding: 14px;
             border: 1px solid #2c2c2e;
-            overflow: hidden;
+            overflow-y: auto;
+            min-height: 100px;
         }
 
         .calc-input {
             background: none;
             border: none;
             color: #ffffff;
-            font-size: 36px;
+            font-size: 38px;
             text-align: right;
             width: 100%;
             outline: none;
@@ -145,90 +137,89 @@
 
         .calc-sub-output {
             color: #aeaeb2;
-            font-size: 24px;
+            font-size: 22px;
             text-align: right;
             width: 100%;
-            min-height: 32px;
-            margin-top: 4px;
-            font-weight: 400;
+            min-height: 28px;
+            margin-top: 2px;
         }
 
-        /* Clean Separated Indian Breakdown Panel to prevent Overlap */
+        /* Structured Breakdown to prevent Overlap Text blocks */
         .breakdown-box {
             display: none;
             width: 100%;
             flex-direction: column;
             align-items: flex-end;
-            gap: 4px;
-            max-height: 130px;
+            gap: 2px;
+            max-height: 100px;
             overflow-y: auto;
-            margin-top: 8px;
+            margin-top: 6px;
             border-top: 1px solid #2c2c2e;
-            padding-top: 8px;
+            padding-top: 6px;
         }
 
         .breakdown-line {
             color: #aeaeb2;
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .total-line {
             color: #30d158;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 600;
-            margin-top: 4px;
             text-align: right;
             word-break: break-all;
         }
 
-        /* Currency Display System Context */
+        /* Currency Grid Protection Layout Matrix */
         .currency-box-container {
             display: none;
             flex-direction: row;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
+            align-items: stretch;
         }
 
         .currency-inputs {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .currency-card {
             background-color: #2c2c2e;
-            border-radius: 14px;
-            padding: 12px 16px;
+            border-radius: 12px;
+            padding: 10px 14px;
             cursor: pointer;
             border: 2px solid transparent;
         }
 
         .currency-label {
             color: #aeaeb2;
-            font-size: 13px;
-            margin-bottom: 4px;
+            font-size: 12px;
+            margin-bottom: 2px;
         }
 
         .currency-val {
             background: none;
             border: none;
             color: #ff9f0a;
-            font-size: 26px;
+            font-size: 24px;
             width: 100%;
             outline: none;
             pointer-events: none;
         }
 
         .currency-swap {
-            width: 54px;
+            width: 48px;
             background-color: #2c2c2e;
-            border-radius: 14px;
+            border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            font-size: 24px;
+            font-size: 22px;
             color: #ff9f0a;
             border: 1px solid #3a3a3c;
         }
@@ -238,37 +229,38 @@
             color: #8e8e93;
             text-align: left;
             width: 100%;
-            margin-top: 6px;
-            min-height: 14px;
+            margin-top: 4px;
+            min-height: 12px;
         }
 
-        /* Indian LTR Buttons Configuration */
+        /* Dynamic Grid Controls: Anti Shrink-Compress System */
         .indian-words-row {
             display: none;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 8px;
             width: 100%;
+            flex-shrink: 0;
         }
 
         .word-btn {
             background-color: #2c2c2e;
             color: #30d158;
             border: 1px solid #3a3a3c;
-            border-radius: 14px;
-            height: 44px;
+            border-radius: 12px;
+            height: 42px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
         }
 
-        /* Compact Layout for Scientific Expanded Grid View Panels */
         .scientific-row-block {
             display: none;
             grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin-bottom: 10px;
+            gap: 6px;
+            margin-bottom: 8px;
             width: 100%;
+            flex-shrink: 0;
         }
 
         .sci-btn {
@@ -276,19 +268,20 @@
             color: #9cdcfe;
             border: 1px solid #3a3a3c;
             border-radius: 10px;
-            height: 38px;
+            height: 36px;
             font-size: 14px;
-            font-weight: 500;
             cursor: pointer;
         }
 
-        /* Touch-Friendly Responsive Dynamic Grid System Matrix */
+        /* Main Absolute Keypad - Never allows bottom cutoffs */
         .keypad {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 10px;
             width: 100%;
-            margin-top: auto; /* Push keypad to stick to bottom safely */
+            flex-shrink: 0; 
+            margin-top: auto;
+            padding-bottom: env(safe-area-inset-bottom, 4px); 
         }
 
         .btn {
@@ -334,13 +327,13 @@
             font-size: 21px;
         }
 
-        /* Mobile Layout Safety Adjustments */
-        @media (max-width: 400px) {
+        /* Super Micro Screen Adaptive Fallback Styling */
+        @media (max-width: 380px) {
             .btn { font-size: 22px; }
-            .double-zero { font-size: 18px; }
-            .calc-input { font-size: 32px; }
-            .calc-sub-output { font-size: 20px; }
-            .total-line { font-size: 19px; }
+            .double-zero { font-size: 17px; }
+            .calc-input { font-size: 30px; }
+            .currency-val { font-size: 20px; }
+            .keypad { gap: 8px; }
         }
     </style>
 </head>
