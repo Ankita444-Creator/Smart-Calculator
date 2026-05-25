@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ultimate Multi-Mode Calculator</title>
     <style>
         * {
@@ -10,55 +10,57 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: #121212;
+            background-color: #000000;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             color: #ffffff;
+            overflow: hidden;
         }
 
+        /* Responsive Wrapper for Mobile & Desktop */
         .calc-container {
             background-color: #1c1c1e;
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
             height: 100vh;
             display: flex;
             flex-direction: column;
-            padding: 24px;
+            padding: 16px 20px 24px 20px;
             position: relative;
-            border: 1px solid #2c2c2e;
         }
 
-        @media (min-width: 401px) {
+        @media (min-width: 441px) {
             .calc-container {
-                height: 885px;
-                border-radius: 32px;
+                height: 860px;
+                border-radius: 36px;
+                border: 1px solid #2c2c2e;
                 box-shadow: 0 25px 60px rgba(0,0,0,0.8);
             }
         }
 
-        /* Top Bar Layout */
+        /* Top Header Navigation Section */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
-            font-size: 22px;
+            padding: 4px 0 10px 0;
+            font-size: 20px;
             font-weight: 600;
             color: #ffffff;
             border-bottom: 1px solid #2c2c2e;
-            margin-bottom: 10px;
-            position: relative;
+            min-height: 44px;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
         }
 
         .sci-toggle-btn {
@@ -67,10 +69,9 @@
             color: #ff9f0a;
             font-size: 22px;
             cursor: pointer;
-            padding: 5px;
+            padding: 6px;
             display: flex;
             align-items: center;
-            user-select: none;
         }
 
         .menu-btn {
@@ -79,15 +80,14 @@
             color: #ff9f0a;
             font-size: 26px;
             cursor: pointer;
-            padding: 5px;
-            user-select: none;
+            padding: 6px;
         }
 
         .menu-dropdown {
             display: none;
             position: absolute;
-            top: 55px;
-            right: 0;
+            top: 60px;
+            right: 20px;
             background-color: #2c2c2e;
             border-radius: 14px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
@@ -100,7 +100,7 @@
         .menu-dropdown button {
             display: block;
             width: 100%;
-            padding: 16px 20px;
+            padding: 15px 20px;
             background: none;
             border: none;
             color: #ffffff;
@@ -114,128 +114,123 @@
             border-bottom: none;
         }
 
-        .menu-dropdown button:hover {
-            background-color: #3a3a3c;
-        }
-
-        /* Display Screen Backdrop */
+        /* Dynamic Expandable Black Screen Panel */
         .display-area {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
             align-items: flex-end;
-            margin-bottom: 16px;
-            overflow: hidden;
-            width: 100%;
+            margin: 12px 0;
+            min-height: 160px;
             background-color: #000000;
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 16px;
             border: 1px solid #2c2c2e;
+            overflow: hidden;
         }
 
         .calc-input {
             background: none;
             border: none;
             color: #ffffff;
-            font-size: 40px;
+            font-size: 36px;
             text-align: right;
             width: 100%;
             outline: none;
-            margin-bottom: 6px;
             font-weight: 400;
             overflow-x: auto;
             white-space: nowrap;
         }
 
         .calc-sub-output {
-            color: #a5a5a5;
-            font-size: 26px;
+            color: #aeaeb2;
+            font-size: 24px;
             text-align: right;
             width: 100%;
-            min-height: 34px;
+            min-height: 32px;
+            margin-top: 4px;
             font-weight: 400;
-            display: block;
         }
 
+        /* Clean Separated Indian Breakdown Panel to prevent Overlap */
         .breakdown-box {
             display: none;
             width: 100%;
             flex-direction: column;
             align-items: flex-end;
-            gap: 6px;
-            max-height: 120px;
+            gap: 4px;
+            max-height: 130px;
             overflow-y: auto;
+            margin-top: 8px;
             border-top: 1px solid #2c2c2e;
             padding-top: 8px;
         }
 
         .breakdown-line {
-            color: #d1d1d6;
-            font-size: 19px;
+            color: #aeaeb2;
+            font-size: 16px;
         }
 
         .total-line {
             color: #30d158;
-            font-size: 30px;
+            font-size: 22px;
             font-weight: 600;
-            margin-top: 2px;
+            margin-top: 4px;
             text-align: right;
             word-break: break-all;
         }
 
-        /* Currency Conversion Cards */
+        /* Currency Display System Context */
         .currency-box-container {
             display: none;
             flex-direction: row;
             gap: 12px;
             width: 100%;
-            margin-bottom: 4px;
         }
 
         .currency-inputs {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .currency-card {
             background-color: #2c2c2e;
-            border-radius: 16px;
-            padding: 16px;
+            border-radius: 14px;
+            padding: 12px 16px;
             cursor: pointer;
-            border: 1px solid #3a3a3c;
+            border: 2px solid transparent;
         }
 
         .currency-label {
             color: #aeaeb2;
-            font-size: 14px;
-            margin-bottom: 6px;
+            font-size: 13px;
+            margin-bottom: 4px;
         }
 
         .currency-val {
             background: none;
             border: none;
             color: #ff9f0a;
-            font-size: 32px;
+            font-size: 26px;
             width: 100%;
             outline: none;
-            pointer-events: none; /* Block native input keyboard triggers */
+            pointer-events: none;
         }
 
         .currency-swap {
-            width: 60px;
+            width: 54px;
             background-color: #2c2c2e;
-            border-radius: 16px;
+            border-radius: 14px;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            font-size: 26px;
+            font-size: 24px;
             color: #ff9f0a;
             border: 1px solid #3a3a3c;
-            user-select: none;
         }
 
         .api-status {
@@ -243,14 +238,15 @@
             color: #8e8e93;
             text-align: left;
             width: 100%;
-            margin-top: 4px;
+            margin-top: 6px;
+            min-height: 14px;
         }
 
-        /* Indian Mode Buttons Row */
+        /* Indian LTR Buttons Configuration */
         .indian-words-row {
             display: none;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 12px;
             width: 100%;
         }
@@ -259,19 +255,19 @@
             background-color: #2c2c2e;
             color: #30d158;
             border: 1px solid #3a3a3c;
-            border-radius: 16px;
-            height: 46px;
+            border-radius: 14px;
+            height: 44px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
         }
 
-        /* Dynamic Scientific Expanded Keypad Layout */
+        /* Compact Layout for Scientific Expanded Grid View Panels */
         .scientific-row-block {
             display: none;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 10px;
             width: 100%;
         }
 
@@ -279,22 +275,20 @@
             background-color: #2c2c2e;
             color: #9cdcfe;
             border: 1px solid #3a3a3c;
-            border-radius: 12px;
-            height: 40px;
+            border-radius: 10px;
+            height: 38px;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
         }
 
-        .sci-btn:active, .word-btn:active {
-            background-color: #3a3a3c;
-        }
-
-        /* Master Keypad Grid Array */
+        /* Touch-Friendly Responsive Dynamic Grid System Matrix */
         .keypad {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
+            gap: 12px;
+            width: 100%;
+            margin-top: auto; /* Push keypad to stick to bottom safely */
         }
 
         .btn {
@@ -309,11 +303,12 @@
             justify-content: center;
             align-items: center;
             user-select: none;
-            transition: background-color 0.1s;
+            transition: background-color 0.1s, transform 0.05s;
         }
 
-        .btn:active {
+        .btn:active, .sci-btn:active, .word-btn:active, .currency-swap:active {
             background-color: #3a3a3c;
+            transform: scale(0.95);
         }
 
         .btn.operator {
@@ -338,16 +333,23 @@
         .double-zero {
             font-size: 21px;
         }
+
+        /* Mobile Layout Safety Adjustments */
+        @media (max-width: 400px) {
+            .btn { font-size: 22px; }
+            .double-zero { font-size: 18px; }
+            .calc-input { font-size: 32px; }
+            .calc-sub-output { font-size: 20px; }
+            .total-line { font-size: 19px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="calc-container">
-    <!-- Navbar Header with Scientific Toggle Icon & 3-Dots Menu -->
     <div class="header">
         <span id="modeTitle">Standard Calculator</span>
         <div class="header-actions">
-            <!-- Dynamic Scientific mode toggle button matching video profile -->
             <button class="sci-toggle-btn" id="sciToggle" onclick="toggleScientificMode()">🔬</button>
             <button class="menu-btn" onclick="toggleMenu()">⋮</button>
         </div>
@@ -358,13 +360,11 @@
         </div>
     </div>
 
-    <!-- Processing Screen Panels -->
     <div class="display-area">
         <input type="text" class="calc-input" id="mainDisplay" value="0" readonly>
         <div class="calc-sub-output" id="subDisplay"></div>
         <div class="breakdown-box" id="breakdownContainer"></div>
 
-        <!-- Currency conversion system display panel -->
         <div class="currency-box-container" id="currencyBox">
             <div class="currency-inputs">
                 <div class="currency-card" id="cardTop" onclick="setActiveCard('top')">
@@ -381,7 +381,6 @@
         <div class="api-status" id="apiTimestamp"></div>
     </div>
 
-    <!-- Extra Collapsible Scientific Functional Rows Layout -->
     <div class="scientific-row-block" id="sciRow1">
         <button class="sci-btn" onclick="pressSciToken('(')">(</button>
         <button class="sci-btn" onclick="pressSciToken(')')">)</button>
@@ -397,7 +396,6 @@
         <button class="sci-btn" onclick="pressSciToken('ln(')">ln</button>
     </div>
 
-    <!-- Indian Metric Words Row -->
     <div class="indian-words-row" id="indianRow">
         <button class="word-btn" onclick="pressWord('Hundred')">Hundred</button>
         <button class="word-btn" onclick="pressWord('Thousand')">Thousand</button>
@@ -405,7 +403,6 @@
         <button class="word-btn" onclick="pressWord('Crore')">Crore</button>
     </div>
 
-    <!-- Main Input Grid Matrix Panel -->
     <div class="keypad">
         <button class="btn action" onclick="pressClear()">AC</button>
         <button class="btn action" id="pctBtn" onclick="pressOperator('%')">%</button>
@@ -499,7 +496,7 @@
         if(mode === 'standard') document.getElementById('modeTitle').innerText = "Standard Calculator";
         if(mode === 'indian') document.getElementById('modeTitle').innerText = "Indian Lakh Mode";
         if(mode === 'currency') {
-            document.getElementById('modeTitle').innerText = "Currency converter";
+            document.getElementById('modeTitle').innerText = "Currency Converter";
             activeCurrencyInput = 'top';
             highlightActiveCard();
         }
@@ -722,7 +719,7 @@
                 if(totalVal !== undefined && !isNaN(totalVal)) {
                     let totalRow = document.createElement('div');
                     totalRow.className = 'total-line';
-                    totalRow.innerText = `= ${convertToIndianWordsString(totalVal)} (${formatIndianNumber(totalVal.toFixed(2))})`;
+                    totalRow.innerText = `= ${convertToIndianWordsString(totalVal.toFixed(2))} (${formatIndianNumber(totalVal.toFixed(2))})`;
                     breakdownContainer.appendChild(totalRow);
                 }
             } catch (e) {}
@@ -790,8 +787,8 @@
     }
 
     function highlightActiveCard() {
-        document.getElementById('cardTop').style.borderColor = activeCurrencyInput === 'top' ? '#ff9f0a' : '#3a3a3c';
-        document.getElementById('cardBottom').style.borderColor = activeCurrencyInput === 'bottom' ? '#ff9f0a' : '#3a3a3c';
+        document.getElementById('cardTop').style.borderColor = activeCurrencyInput === 'top' ? '#ff9f0a' : 'transparent';
+        document.getElementById('cardBottom').style.borderColor = activeCurrencyInput === 'bottom' ? '#ff9f0a' : 'transparent';
     }
 </script>
 </body>
