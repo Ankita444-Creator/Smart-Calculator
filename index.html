@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Multi-Mode Indian Calculator</title>
+    <title>Ultimate Multi-Mode Calculator</title>
     <style>
         * {
             box-sizing: border-box;
@@ -13,7 +13,7 @@
         }
 
         body {
-            background-color: #121212; /* Subtle dark background so app body pops clearly */
+            background-color: #121212;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -22,7 +22,7 @@
         }
 
         .calc-container {
-            background-color: #1c1c1e; /* Distinct, deep grey layer container - no blending */
+            background-color: #1c1c1e;
             width: 100%;
             max-width: 420px;
             height: 100vh;
@@ -41,7 +41,7 @@
             }
         }
 
-        /* Top Bar Header Dropdown Matrix */
+        /* Top Bar Layout */
         .header {
             display: flex;
             justify-content: space-between;
@@ -54,11 +54,28 @@
             margin-bottom: 10px;
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .sci-toggle-btn {
+            background: none;
+            border: none;
+            color: #ff9f0a;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+        }
+
         .menu-btn {
             background: none;
             border: none;
             color: #ff9f0a;
-            font-size: 28px;
+            font-size: 26px;
             cursor: pointer;
             padding: 5px;
         }
@@ -98,7 +115,7 @@
             background-color: #3a3a3c;
         }
 
-        /* High Visibility Dual Display Area */
+        /* Display Screen Backdrop */
         .display-area {
             flex-grow: 1;
             display: flex;
@@ -108,7 +125,7 @@
             margin-bottom: 16px;
             overflow: hidden;
             width: 100%;
-            background-color: #000000; /* Jet black operational screen backdrop */
+            background-color: #000000;
             border-radius: 16px;
             padding: 16px;
             border: 1px solid #2c2c2e;
@@ -128,7 +145,6 @@
             white-space: nowrap;
         }
 
-        /* Standard Sub-Output Text String Layer */
         .calc-sub-output {
             color: #a5a5a5;
             font-size: 26px;
@@ -139,14 +155,13 @@
             display: block;
         }
 
-        /* Indian Multi-line Dynamic Vertical Matrix Breakdown List Box */
         .breakdown-box {
             display: none;
             width: 100%;
             flex-direction: column;
             align-items: flex-end;
             gap: 6px;
-            max-height: 150px;
+            max-height: 120px;
             overflow-y: auto;
             border-top: 1px solid #2c2c2e;
             padding-top: 8px;
@@ -157,7 +172,6 @@
             font-size: 19px;
         }
 
-        /* Smart Render Final Green String Label Line */
         .total-line {
             color: #30d158;
             font-size: 30px;
@@ -167,7 +181,7 @@
             word-break: break-all;
         }
 
-        /* Currency Interface Components Overlay Layout */
+        /* Currency Conversion Cards */
         .currency-box-container {
             display: none;
             flex-direction: row;
@@ -184,7 +198,7 @@
         }
 
         .currency-card {
-            background-color: #2c2c2e; /* Card layers pop outside screen container matrix */
+            background-color: #2c2c2e;
             border-radius: 16px;
             padding: 16px;
             cursor: pointer;
@@ -227,12 +241,12 @@
             margin-top: 4px;
         }
 
-        /* Action Grid Green Rows */
+        /* Indian Mode Buttons Row */
         .indian-words-row {
             display: none;
             grid-template-columns: repeat(4, 1fr);
             gap: 12px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             width: 100%;
         }
 
@@ -241,17 +255,37 @@
             color: #30d158;
             border: 1px solid #3a3a3c;
             border-radius: 16px;
-            height: 52px;
+            height: 46px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
         }
 
-        .word-btn:active {
+        /* Dynamic Scientific Expanded Keypad Layout */
+        .scientific-row-block {
+            display: none;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+            width: 100%;
+        }
+
+        .sci-btn {
+            background-color: #2c2c2e;
+            color: #9cdcfe;
+            border: 1px solid #3a3a3c;
+            border-radius: 12px;
+            height: 40px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .sci-btn:active, .word-btn:active {
             background-color: #3a3a3c;
         }
 
-        /* Master Physical Keyboard System array */
+        /* Master Keypad Grid Array */
         .keypad {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -259,7 +293,7 @@
         }
 
         .btn {
-            background-color: #2c2c2e; /* Light ash grey buttons popping against slate frame container */
+            background-color: #2c2c2e;
             color: #ffffff;
             border: none;
             border-radius: 50%;
@@ -306,7 +340,10 @@
 <div class="calc-container">
     <div class="header">
         <span id="modeTitle">Standard Calculator</span>
-        <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+        <div class="header-actions">
+            <button class="sci-toggle-btn" id="sciToggle" onclick="toggleScientificMode()">🔬</button>
+            <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+        </div>
         <div class="menu-dropdown" id="menuDropdown">
             <button onclick="switchMode('standard')">Standard Calc</button>
             <button onclick="switchMode('indian')">Indian Lakh Mode</button>
@@ -316,9 +353,7 @@
 
     <div class="display-area">
         <input type="text" class="calc-input" id="mainDisplay" value="0" readonly>
-        
         <div class="calc-sub-output" id="subDisplay"></div>
-
         <div class="breakdown-box" id="breakdownContainer"></div>
 
         <div class="currency-box-container" id="currencyBox">
@@ -335,6 +370,21 @@
             <div class="currency-swap" onclick="swapCurrency()">⇅</div>
         </div>
         <div class="api-status" id="apiTimestamp"></div>
+    </div>
+
+    <div class="scientific-row-block" id="sciRow1">
+        <button class="sci-btn" onclick="pressSciToken('(')">(</button>
+        <button class="sci-btn" onclick="pressSciToken(')')">)</button>
+        <button class="sci-btn" onclick="pressSciToken('√(')">√</button>
+        <button class="sci-btn" onclick="pressSciToken('π')">π</button>
+        <button class="sci-btn" onclick="pressSciToken('e')">e</button>
+    </div>
+    <div class="scientific-row-block" id="sciRow2">
+        <button class="sci-btn" onclick="pressSciToken('sin(')">sin</button>
+        <button class="sci-btn" onclick="pressSciToken('cos(')">cos</button>
+        <button class="sci-btn" onclick="pressSciToken('tan(')">tan</button>
+        <button class="sci-btn" onclick="pressSciToken('log(')">log</button>
+        <button class="sci-btn" onclick="pressSciToken('ln(')">ln</button>
     </div>
 
     <div class="indian-words-row" id="indianRow">
@@ -374,6 +424,8 @@
 
 <script>
     let currentMode = 'standard';
+    let isSciOpen = false;
+    
     let mainDisplay = document.getElementById('mainDisplay');
     let subDisplay = document.getElementById('subDisplay');
     let breakdownContainer = document.getElementById('breakdownContainer');
@@ -395,9 +447,7 @@
                 let now = new Date();
                 document.getElementById('apiTimestamp').innerText = `Rates update: ${now.toLocaleDateString()} ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}).toLowerCase()}`;
             }
-        } catch(e) {
-            document.getElementById('apiTimestamp').innerText = "Using baseline network local rates.";
-        }
+        } catch(e) {}
     }
     fetchRates();
 
@@ -406,11 +456,25 @@
         dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
     }
 
+    // Expand/Collapse Scientific Buttons Matrix Row layers smoothly
+    function toggleScientificMode() {
+        if(currentMode === 'currency') return;
+        isSciOpen = !isSciOpen;
+        let displayState = isSciOpen ? 'grid' : 'none';
+        document.getElementById('sciRow1').style.display = displayState;
+        document.getElementById('sciRow2').style.display = displayState;
+        document.getElementById('sciToggle').style.color = isSciOpen ? '#30d158' : '#ff9f0a';
+    }
+
     function switchMode(mode) {
         currentMode = mode;
         toggleMenu();
         pressClear();
         
+        // Scientific toggle hidden automatically if entering currency mode matrix
+        document.getElementById('sciToggle').style.visibility = (mode === 'currency') ? 'hidden' : 'visible';
+        if(mode === 'currency' && isSciOpen) toggleScientificMode();
+
         document.getElementById('indianRow').style.display = (mode === 'indian') ? 'grid' : 'none';
         document.getElementById('breakdownContainer').style.display = (mode === 'indian') ? 'flex' : 'none';
         document.getElementById('subDisplay').style.display = (mode === 'standard') ? 'block' : 'none';
@@ -430,283 +494,3 @@
             highlightActiveCard();
         }
     }
-
-    function formatIndianNumber(num) {
-        if (!num || isNaN(num)) return num;
-        let str = num.toString().replace(/,/g, '');
-        let parts = str.split('.');
-        let x = parts[0];
-        let lastThree = x.substring(x.length - 3);
-        let otherNumbers = x.substring(0, x.length - 3);
-        if (otherNumbers != '') lastThree = ',' + lastThree;
-        let res = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
-        if (parts.length > 1) res += '.' + parts[1];
-        return res;
-    }
-
-    // High Performance Intelligent Word Simplifier Conversion Layer Engine
-    function convertToIndianWordsString(num) {
-        let val = Math.abs(parseFloat(num));
-        if (isNaN(val) || val === 0) return "0";
-        
-        let prefix = parseFloat(num) < 0 ? "-" : "";
-        
-        // Denomination tiers setup
-        let crore = 10000000;
-        let lakh = 100000;
-        let thousand = 1000;
-        let hundred = 100;
-
-        if (val >= crore) {
-            let count = val / crore;
-            return prefix + (count % 1 === 0 ? count : count.toFixed(2)) + " Crore";
-        }
-        if (val >= lakh) {
-            let count = val / lakh;
-            return prefix + (count % 1 === 0 ? count : count.toFixed(2)) + " Lakh";
-        }
-        if (val >= thousand) {
-            let count = val / thousand;
-            return prefix + (count % 1 === 0 ? count : count.toFixed(2)) + " Thousand";
-        }
-        if (val >= hundred) {
-            let count = val / hundred;
-            return prefix + (count % 1 === 0 ? count : count.toFixed(2)) + " Hundred";
-        }
-        return prefix + formatIndianNumber(val);
-    }
-
-    function pressNum(num) {
-        if(currentMode === 'currency') {
-            let field = activeCurrencyInput === 'top' ? document.getElementById('valTop') : document.getElementById('valBottom');
-            if(field.value === '0' && num !== '.') field.value = num;
-            else field.value += num;
-            calculateCurrency(activeCurrencyInput);
-            return;
-        }
-
-        if(currentMode === 'standard') {
-            if(rawStandardExpression === "0" && num !== '.') rawStandardExpression = num;
-            else rawStandardExpression += num;
-            renderStandardRealTime();
-        } else {
-            currentIndianBuffer += num;
-            renderIndianRealTime();
-        }
-    }
-
-    function pressWord(word) {
-        if (currentMode !== 'indian' || currentIndianBuffer === "") return;
-        indianTokens.push({ type: 'value', number: currentIndianBuffer, suffix: word });
-        currentIndianBuffer = "";
-        renderIndianRealTime();
-    }
-
-    function pressOperator(op) {
-        if(currentMode === 'currency') return;
-
-        if(currentMode === 'standard') {
-            if(rawStandardExpression === "") return;
-            let last = rawStandardExpression.slice(-1);
-            if(["+", "-", "*", "/", "%"].includes(last)) {
-                rawStandardExpression = rawStandardExpression.slice(0, -1) + op;
-            } else {
-                rawStandardExpression += op;
-            }
-            renderStandardRealTime();
-        } else {
-            if (currentIndianBuffer !== "") {
-                indianTokens.push({ type: 'value', number: currentIndianBuffer, suffix: '' });
-                currentIndianBuffer = "";
-            }
-            if (indianTokens.length === 0) return;
-            if (indianTokens[indianTokens.length - 1].type === 'operator') {
-                indianTokens[indianTokens.length - 1].char = op;
-            } else {
-                indianTokens.push({ type: 'operator', char: op });
-            }
-            renderIndianRealTime();
-        }
-    }
-
-    function pressClear() {
-        rawStandardExpression = "";
-        indianTokens = [];
-        currentIndianBuffer = "";
-        mainDisplay.value = "0";
-        subDisplay.innerText = "";
-        breakdownContainer.innerHTML = "";
-        document.getElementById('valTop').value = '0';
-        document.getElementById('valBottom').value = '0';
-    }
-
-    function pressBackspace() {
-        if(currentMode === 'currency') {
-            let field = activeCurrencyInput === 'top' ? document.getElementById('valTop') : document.getElementById('valBottom');
-            field.value = field.value.slice(0, -1);
-            if(field.value === '') field.value = '0';
-            calculateCurrency(activeCurrencyInput);
-            return;
-        }
-
-        if(currentMode === 'standard') {
-            rawStandardExpression = rawStandardExpression.slice(0, -1);
-            renderStandardRealTime();
-        } else {
-            if (currentIndianBuffer !== "") {
-                currentIndianBuffer = currentIndianBuffer.slice(0, -1);
-            } else if (indianTokens.length > 0) {
-                let popped = indianTokens.pop();
-                if (popped.type === 'value') currentIndianBuffer = popped.number;
-            }
-            renderIndianRealTime();
-        }
-    }
-
-    function renderStandardRealTime() {
-        if(rawStandardExpression === "") {
-            mainDisplay.value = "0";
-            subDisplay.innerText = "";
-            return;
-        }
-        let tokens = rawStandardExpression.split(/([\+\-\*\/%])/);
-        for(let i=0; i<tokens.length; i++) {
-            if(tokens[i] && !["+", "-", "*", "/", "%"].includes(tokens[i])) {
-                tokens[i] = formatIndianNumber(tokens[i]);
-            }
-        }
-        mainDisplay.value = tokens.join("");
-
-        try {
-            let expr = rawStandardExpression;
-            if(["+", "-", "*", "/", "%"].includes(expr.slice(-1))) expr = expr.slice(0, -1);
-            expr = expr.replace(/([0-9.]+)\s*%/g, "($1/100)");
-            let res = new Function(`return (${expr})`)();
-            if(res !== undefined) subDisplay.innerText = formatIndianNumber(res.toString());
-        } catch(e) {}
-    }
-
-    function renderIndianRealTime() {
-        let topStringArr = [];
-        indianTokens.forEach(t => {
-            if (t.type === 'value') topStringArr.push(`${t.number} ${t.suffix}`.trim());
-            else topStringArr.push(` ${t.char} `);
-        });
-        if (currentIndianBuffer !== "") topStringArr.push(currentIndianBuffer);
-        mainDisplay.value = topStringArr.join("") || "0";
-
-        breakdownContainer.innerHTML = "";
-        let multiplierMap = { 'Hundred': 100, 'Thousand': 1000, 'Lakh': 100000, 'Crore': 10000000 };
-        let mathArr = [];
-
-        indianTokens.forEach(t => {
-            if (t.type === 'value') {
-                let factor = multiplierMap[t.suffix] || 1;
-                let calcVal = parseFloat(t.number) * factor;
-                mathArr.push(calcVal);
-
-                let row = document.createElement('div');
-                row.className = 'breakdown-line';
-                row.innerText = `${t.suffix ? t.suffix + ': ' : ''}${formatIndianNumber(calcVal)}`;
-                breakdownContainer.appendChild(row);
-            } else {
-                mathArr.push(t.char);
-            }
-        });
-
-        if (currentIndianBuffer !== "") {
-            let row = document.createElement('div');
-            row.className = 'breakdown-line';
-            row.innerText = formatIndianNumber(currentIndianBuffer);
-            breakdownContainer.appendChild(row);
-            mathArr.push(parseFloat(currentIndianBuffer));
-        }
-
-        if (mathArr.length > 0) {
-            try {
-                let last = mathArr[mathArr.length - 1];
-                if (['+', '-', '*', '/', '%'].includes(last)) mathArr.pop();
-                let totalVal = new Function(`return (${mathArr.join("").replace(/×/g, '*').replace(/÷/g, '/')})`)();
-                
-                // Active calculation outputs dynamic formatted word strings alongside raw commas
-                let totalRow = document.createElement('div');
-                totalRow.className = 'total-line';
-                totalRow.innerText = `= ${convertToIndianWordsString(totalVal)} (${formatIndianNumber(totalVal)})`;
-                breakdownContainer.appendChild(totalRow);
-            } catch (e) {}
-        }
-        breakdownContainer.scrollTop = breakdownContainer.scrollHeight;
-    }
-
-    function pressEqual() {
-        if(currentMode === 'currency') return;
-
-        if(currentMode === 'standard') {
-            if(subDisplay.innerText !== "") {
-                mainDisplay.value = subDisplay.innerText;
-                rawStandardExpression = subDisplay.innerText.replace(/,/g, '');
-                subDisplay.innerText = "";
-            }
-        } else {
-            if (breakdownContainer.lastChild && breakdownContainer.lastChild.className === 'total-line') {
-                let rawMatch = breakdownContainer.lastChild.innerText.match(/\(([^)]+)\)/);
-                if (rawMatch) {
-                    let finalVal = rawMatch[1].replace(/,/g, '');
-                    indianTokens = [];
-                    currentIndianBuffer = finalVal;
-                    renderIndianRealTime();
-                }
-            }
-        }
-    }
-
-    function calculateCurrency(source) {
-        let topVal = parseFloat(document.getElementById('valTop').value.replace(/,/g, '')) || 0;
-        let bottomVal = parseFloat(document.getElementById('valBottom').value.replace(/,/g, '')) || 0;
-
-        if(source === 'top') {
-            if(isTopUSD) {
-                document.getElementById('valBottom').value = formatIndianNumber((topVal * usdToInrRate).toFixed(2));
-            } else {
-                document.getElementById('valTop').value = formatIndianNumber((topVal / usdToInrRate).toFixed(4));
-            }
-        } else {
-            if(isTopUSD) {
-                document.getElementById('valTop').value = formatIndianNumber((bottomVal / usdToInrRate).toFixed(4));
-            } else {
-                document.getElementById('valBottom').value = formatIndianNumber((bottomVal * usdToInrRate).toFixed(2));
-            }
-        }
-    }
-
-    function swapCurrency() {
-        isTopUSD = !isTopUSD;
-        let lblTop = document.getElementById('lblTop');
-        let lblBottom = document.getElementById('lblBottom');
-        
-        if(isTopUSD) {
-            lblTop.innerText = "US Dollar USD >";
-            lblBottom.innerText = "Indian Rupee INR >";
-        } else {
-            lblTop.innerText = "Indian Rupee INR >";
-            lblBottom.innerText = "US Dollar USD >";
-        }
-        pressClear();
-    }
-
-    function highlightActiveCard() {
-        document.getElementById('cardTop').style.borderColor = activeCurrencyInput === 'top' ? '#ff9f0a' : '#3a3a3c';
-        document.getElementById('cardBottom').style.borderColor = activeCurrencyInput === 'bottom' ? '#ff9f0a' : '#3a3a3c';
-    }
-
-    document.getElementById('cardTop').addEventListener('click', () => {
-        activeCurrencyInput = 'top';
-        highlightActiveCard();
-    });
-    document.getElementById('cardBottom').addEventListener('click', () => {
-        activeCurrencyInput = 'bottom';
-        highlightActiveCard();
-    });
-</script>
-</body>
-</html>
